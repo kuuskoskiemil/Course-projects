@@ -1,43 +1,81 @@
-# Heat Transfer Simulation & Analysis
+# 2D Heat Transfer & Numerical Fluid Thermal Simulations
 
-Numerical simulations and thermodynamic analysis scripts developed for heat transfer course assignments at Aalto University. The repository covers 1D and 2D finite difference methods (FDM) for conduction, laminar convective heat transfer with advection-diffusion, surface radiation equilibrium, and real-gas thermodynamic cycle modeling.
-
----
-
-## 📌 Topics & Weekly Assignments
-
-### Week 1: 1D Transient Conduction & Lumped Capacitance Cooling
-- **`week1s1.m`**: Transient 1D conduction with an initial sinusoidal temperature perturbation. Computes analytical temperature decay over time towards equilibrium.
-- **`week1s2.m`**: Lumped capacitance model comparing numerical Euler integration against analytical exponential cooling across different convection coefficients ($h_1 = 8.09 \text{ W/m}^2\text{K}$ and $h_2 = 40 \text{ W/m}^2\text{K}$).
-
-### Week 2: Finite Difference Method (FDM) Verification & 1D Diffusion
-- **`week2s1.m`**: Spatial discretization of first- and second-order derivatives using central difference schemes on a 1D grid with ghost cells. Validated directly against analytical Gaussian derivatives.
-- **`week2s2.m`**: Explicit finite difference solver for 1D transient heat diffusion with an imposed surface heat flux (Neumann boundary condition) and fixed temperature boundaries.
-- **`week2/s2c.m`**: Extended transient diffusion simulations and boundary sensitivity investigations.
-
-### Week 3: 2D Heat Conduction & Pipe Heat Exchanger Sizing
-- **`week3/Viikko3laskari.m`**, **`week3/set_bc.m`**, **`week3/compute_derivatives.m`**: 2D heat conduction solver using finite difference central differencing on structured Cartesian meshes with ghost cell boundary conditions (Dirichlet and Neumann).
-- **`week3/pp2.m`**: Conjugate heat transfer analysis in a counterflow/crossflow pipe heat exchanger:
-  - Internal forced convection (Gnielinski/Dittus-Boelter style correlations).
-  - External natural convection using Rayleigh/Grashof numbers ($Gr$) and Prandtl numbers ($Pr$).
-  - Cylindrical conduction resistance and Log-Mean Temperature Difference (LMTD) method to solve for required pipe length.
-
-### Week 4: 2D Convection-Diffusion in Laminar Channel Flow
-- **`week4/C1.m`**: 2D advection-diffusion solver modeling forced convective heat transfer in laminar duct flow.
-  - Implements fully developed parabolic Poiseuille velocity profile: $u(y) = \frac{4 U_{max}}{H^2}(H y - y^2)$.
-  - Captures thermal boundary layer development and validates thermal entry length $x_t \approx 0.05 \cdot Re \cdot Pr \cdot H$.
-- **`week4/Pp1.m`**, **`week4/Pp2.m`**: Supplementary heat exchanger and convective boundary layer exercises.
-
-### Week 5: Thermal Radiation & Gas Turbine Cycle Analysis
-- **`week5/C1.m`**: Conjugate thermal radiation and 1D transient heat conduction through a vehicle roof exposed to solar irradiance ($G = 1200 \text{ W/m}^2$) and radiative exchange with the sky ($T_{sky} = 280\text{ K}$):
-  - Solves nonlinear surface energy balance $\alpha G = \epsilon \sigma (T^4 - T_{sky}^4) + h(T - T_{amb})$.
-  - Models transient temperature diffusion through the roof material for various convection coefficients $h \in \{0, 10, 25, 50\} \text{ W/m}^2\text{K}$.
-- **`week5/Avoin_kaasuturbiini.py`**: Open Brayton gas turbine cycle simulation in Python using **Cantera**:
-  - Uses NASA 7-term polynomials for temperature-dependent real gas specific enthalpies and entropies ($O_2 / N_2$ air mixture).
-  - Computes isentropic compressor power, combustor heat addition, turbine expansion work, and overall thermal efficiency.
+Advanced numerical simulations of two-dimensional heat transfer phenomena in MATLAB, developed as part of computational heat transfer coursework at Aalto University. The repository highlights two complex 2D simulation solvers utilizing finite difference methods (FDM): **laminar advection-diffusion in channel flow** and **transient 2D heat diffusion with analytical verification**.
 
 ---
 
-## 🛠️ Tools & Environments
-- **MATLAB**: Finite difference discretization, mesh generation (`meshgrid`), vectorization with ghost cells, ODE integration, and visualization.
-- **Python**: [Cantera](https://cantera.org/) chemical kinetics and thermodynamics library, NumPy.
+## 📁 Repository Structure
+
+```text
+├── 2D_Convection_Channel_Flow/
+│   ├── channel_convection_diffusion.m   # 2D Advection-Diffusion solver
+│   ├── compute_derivatives.m            # 2D central difference derivative operator
+│   ├── c1a.jpg                          # Temperature contour visualization
+│   ├── c1b.jpg                          # Cup-mean temperature progression
+│   ├── c1b2.jpg                         # Entry length & Nusselt number validation
+│   └── c1c.jpg                          # Boundary heat flux and thermal profiles
+│
+├── 2D_Transient_Conduction/
+│   ├── transient_conduction_2d.m        # 2D transient diffusion solver & verification
+│   ├── compute_derivatives.m            # 2D spatial derivative functions
+│   ├── set_bc.m                         # Ghost-cell boundary condition handler
+│   ├── S1a.jpg                          # Initial 2D Gaussian thermal field
+│   ├── s1b.jpg                          # 1st spatial derivative verification (numerical vs. analytical)
+│   ├── s1c.jpg                          # 2nd spatial derivative verification (numerical vs. analytical)
+│   └── s2.jpg                           # Time-dependent 3D surface relaxation
+│
+├── .gitignore
+└── README.md
+```
+
+---
+
+## 🔬 Project 1: 2D Laminar Convective Heat Transfer in Duct Flow
+
+Located in [`2D_Convection_Channel_Flow/`](./2D_Convection_Channel_Flow/)
+
+Simulates forced convection in a 2D channel where fluid enters at an inlet temperature and is heated by constant-temperature walls. The solver couples a fully developed hydrodynamic velocity profile with the unsteady energy equation.
+
+### Governing Equation
+$$\frac{\partial T}{\partial t} = \alpha \left(\frac{\partial^2 T}{\partial x^2} + \frac{\partial^2 T}{\partial y^2}\right) - u_x(y) \frac{\partial T}{\partial x}$$
+
+### Key Features & Physics
+- **Velocity Profile**: Fully developed laminar Poiseuille flow:
+  $$u_x(y) = \frac{4 U_{\max}}{H^2} (H y - y^2), \quad u_y = 0$$
+- **Boundary Conditions**:
+  - Heated upper and lower walls: Dirichlet constant temperature $T_s = 303\text{ K}$
+  - Channel inlet: Uniform incoming fluid $T_{\text{in}} = 293\text{ K}$
+  - Channel outlet: Convective outflow condition $\frac{\partial T}{\partial x} = 0$
+- **Bulk (Cup-Mean) Temperature**:
+  $$T_m(x) = \frac{\int_0^H T(x,y)\, u_x(y)\, dy}{\int_0^H u_x(y)\, dy}$$
+- **Nusselt Number & Entry Length Validation**:
+  - Evaluates local wall heat flux $q''_{\text{wall}}(x) = k \left.\frac{\partial T}{\partial y}\right|_{\text{wall}}$ and heat transfer coefficient $h(x) = \frac{q''_{\text{wall}}(x)}{T_s - T_m(x)}$.
+  - Validates local Nusselt number $Nu(x)$ against theoretical asymptotic values ($Nu_\infty = 7.52$ for parallel plates).
+  - Validates thermal entrance length:
+    $$x_t \approx 0.05 \cdot Re \cdot Pr \cdot H$$
+
+---
+
+## 🔬 Project 2: 2D Transient Heat Diffusion & FDM Verification
+
+Located in [`2D_Transient_Conduction/`](./2D_Transient_Conduction/)
+
+Models unsteady 2D conduction starting from an anisotropic Gaussian temperature pulse. Prior to time-stepping, the numerical spatial derivative operators are rigorously benchmarked against closed-form analytical solutions.
+
+### Governing Equation
+$$\frac{\partial T}{\partial t} = \alpha \nabla^2 T = \alpha \left(\frac{\partial^2 T}{\partial x^2} + \frac{\partial^2 T}{\partial y^2}\right)$$
+
+### Key Features & Physics
+- **Initial Thermal Condition**: 2D anisotropic Gaussian distribution:
+  $$T(x,y,0) = T_{\text{ref}} + T_a \exp\left(-\frac{(x - x_c)^2}{2\sigma_x^2} - \frac{(y - y_c)^2}{2\sigma_y^2}\right)$$
+- **Boundary Handling via Ghost Cells**:
+  - Lateral boundaries ($x = 0, L_x$): Isothermal Dirichlet conditions ($T = 290\text{ K}$)
+  - Top & bottom boundaries ($y = 0, L_y$): Insulated adiabatic Neumann conditions ($\frac{\partial T}{\partial y} = 0$)
+- **Numerical Scheme Verification**:
+  - Compares 2nd-order central differences for $\frac{\partial T}{\partial x}$ and $\frac{\partial^2 T}{\partial y^2}$ with symbolic analytical derivatives.
+- **Dynamic Evolution**: Solves transient decay using explicit forward Euler time-stepping and visualizes 3D temperature relaxation over time.
+
+---
+
+## 💻 Tech Stack
+- **MATLAB**: 2D finite difference discretization, vectorized stencil indexing with ghost cells, mesh generation (`meshgrid`), ODE numerical time-stepping, and surface contour visualization.

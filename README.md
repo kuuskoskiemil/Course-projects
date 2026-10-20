@@ -1,4 +1,4 @@
-**List of what this repository holds. 
+#**List of what this repository holds. 
 **
 # 2D Heat Transfer & Numerical Fluid Thermal Simulations
 
